@@ -4,19 +4,28 @@
 #include <ctype.h>
 #include <string.h>
 
-//DECLARACAO
+//DECLARACAO DE FUNCOES
+void menuprincipal(void);
 void menucode(void);
 void menudecode(void);
 void menucesar(void);
 void menudecodecesar(void);
 void derCaesarEncoder(char* mensagem, int k);
 char codeRevCesar(char letra,int k);
+void decoderCesar(char* mensagem, int selecao);
+char* equalizador_de_string(char* frase, char* senha);
+void menuVerman();
+char* ascii_to_binary_char(char letra);
+char binary_to_ascii_char(char* numbin);
+
+
 void clear_screen(void);
 
 //MAIN
 int main(){
     menuprincipal();
     return(0);
+
 }
 
 //menus
@@ -82,8 +91,8 @@ void menucode(){
                 break;
 
             case 2:
-
                 clear_screen();
+                menuVerman();
                 break;
                 //todo();
 
@@ -116,8 +125,6 @@ void menucesar(){
 
     char dummy[1024];
     fgets(dummy, 1024, stdin);
-
-    fflush(stdin);
 
     fgets(texto,1024,stdin);
 
@@ -167,7 +174,31 @@ void menucesar(){
 
 //MENU PRINCIPAL -> MENU CODE -> MENU VERNAM
 
-//todo
+void menuVerman(){
+
+    char* texto= malloc((1024)*sizeof(char));
+    char* senha= malloc((1024)*sizeof(char));
+    int escolha;
+
+    printf("\nCIFRA VERMAN");
+    printf("\nDigite o texto:\n");
+
+    char dummy[1024];
+    fgets(dummy, 1024, stdin);
+
+
+    fgets(texto,1024,stdin);
+
+
+    printf("\n\nDigite a chave da sua mensagem:\n");
+
+    fgets(senha,1024,stdin);
+   /* char* retorno =codificadorVernam(texto,senha);*/
+
+    clear_screen();
+    printf("");
+
+}
 
 //MENU PRINCIPAL -> MENU DECODE
 
@@ -191,6 +222,7 @@ void menudecode(){
             case 2:
 
                 clear_screen();
+                menuVerman();
                 break;
                 //todo();
 
@@ -275,6 +307,7 @@ void menudecodecesar(){
 
 }
 
+//MENU PRINCIPAL -> MENU DECODE -> MENUCECODEVERMAN
 
 //codificadores
 
@@ -346,32 +379,91 @@ void derCaesarEncoder(char* mensagem,int k){
 }
 
 //CODIFICADORES VERNAM
-
-void codificadorVernam(char* mensagem, char* chave){
+/*
+char* codificadorVernam(char* mensagem, char* chave){
     
-    char tempm, tampk;
+    int lenm= strlen(mensagem);
+    int lenk= strlen(chave);
+    char* chavecomp=equalizadordestring(mensagem, chave);
+    char temp;
+    char* resultado=malloc((lenm+1)*sizeof(char));
+    for(int i=0;i<lenm;i++)
+    {
 
+        temp = mensagem[i] ^ chavecomp[i];
+        printf("%c",temp);
+    }
+    resultado[lenm]='\0';
+    free(chavecomp);
+    return resultado;
+}
 
+char* equalizadordestring(char* mensagem,char* chave){
+
+    int lenm=strlen(mensagem);
+    int lenk=strlen(chave);
+    char* temp=malloc((lenm+1)*sizeof(char));
+
+    for(int i=0;i<lenm;i++)
+    {
+
+        temp[i]=chave[i % lenk];
+    
+    }
+    
+    temp[lenm]='\0';
+    return temp;
 
 }
+
+*/
 /*  
     ideia principal transformar o valor asc em um valor binario, realizar xor por meio da chave
     para caber em strings de tamanhos diversos, esse nao possui limitador de alfabeto, tampouco
     deve realizar o reset ao chegar ao fim da tabela asc
 */
 
+char* equalizador_de_string(char* frase, char* senha)
+{
 
-//todo
+    if (!frase || !senha) {
+        return NULL;
+    }
 
-char* asciitobinfrase(char* frase)
+    int lens = strlen(frase);
+    int lensenha = strlen(senha);
+
+    char* retorno = malloc(lens * sizeof(char));
+    if (!retorno) {
+        return NULL;
+    }
+
+    char* temp = malloc(lens * sizeof(char));
+    if (!temp) {
+        free(retorno);
+        return NULL;
+    }
+
+    for (int i = 0; i < lens; i++) {
+        temp[i] = senha[i % lensenha];
+    }
+
+    strcpy(retorno, temp);
+    free(temp);
+    return retorno;
+
+}
+
+char* ascii_to_binary_string(char* frase)
 {
 
     int len=strlen(frase);
     char* retorno=malloc(((len*8)+1)*sizeof(char));
-    char* temp;
     retorno[0]='\0';
+    char* temp=malloc(9*sizeof(char));
+
     for(int i=0;i<len;i++){
-            temp=asciitobinletra(frase[i]);
+            temp=ascii_to_binary_char(frase[i]);
             strcat(retorno,temp);
             free(temp);
 
@@ -379,11 +471,11 @@ char* asciitobinfrase(char* frase)
     return retorno;
 }
 
-char* asciitobinletra(char letra)
+char* ascii_to_binary_char(char letra)
 {
 
     unsigned char asciivalue= letra;
-    char* retornobin=(char*) malloc(9);
+    char* retornobin=malloc(9*sizeof(char));
     if(retornobin==NULL){
         return NULL;
     }
@@ -392,17 +484,38 @@ char* asciitobinletra(char letra)
 
 }
 
-char* xor(char* mensagem, char* chave)
-{
-    
+char* xor(char* mensagembin, char* chave)
+{   
+    int len =  strlen(mensagembin);
+    char* retorno=malloc((len+1)*sizeof(char));
+    if(retorno==NULL)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < len; i++)
+    {
+        retorno[i] = (mensagembin[i] == chave[i]) ? '0' : '1';
+    }
+    retorno[len]='\0';
+    return retorno;
 }
 
-char bintoasciifrase(char* frasebin)
+char* binary_to_ascii_string(char* frasebin)
 {
     
+    int len=strlen(frasebin);
+    char* retorno= malloc((len/8)+1);
+    retorno[0]='\0';
+    for(int i=0; i<len;i+=8){
+        char* temp= binary_to_ascii_char(frasebin + i);
+        strcat(retorno, temp);
+        free(temp);
+    }
+    return retorno;
+
 }
 
-char bintoasciiletra(char* numbin)
+char binary_to_ascii_char(char* numbin)
 {
 
     long valor= strtol(numbin ,NULL ,2);
@@ -410,6 +523,7 @@ char bintoasciiletra(char* numbin)
     return retorno;
 
 }
+//todo
 
 
 //ADICIONAR CODIFICADORES AQUI
@@ -545,6 +659,11 @@ void clear_screen(){
 
 
 //base input copiar nos menus.
+
+
+//codigo a seguir pode ser substituido por um simples "^" entre 2 strings....
+
+
 /*    fflush();
     char* texto= malloc((1024)*sizeof(char));
     printf("Digite o texto:\n");
