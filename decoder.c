@@ -1,4 +1,3 @@
-// Rafael Alves de Sousa Costa  | RA:22304563
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -9,7 +8,6 @@ const char* ascii_armor_table = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMN
                                  "[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ "
                                  "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                  "0123456789";
-
 
 //DECLARACAO DE FUNCOES
 void menuprincipal(void);
@@ -24,18 +22,7 @@ char* equalizador_de_string(char* frase, char* senha);
 void menuVerman();
 void codeurVernam(char* texto,char* senha,char* cripto);
 void decodeurVernam(char *cripto,char*senha,char* texto);
-void menuDecodeVernam();
-
-//funcoes eliminadas
-
-//char* xor(char* mensagembin, char* chave);
-//char* ascii_to_binary_char(char letra);
-//char* ascii_to_binary_string(char* frase);
-//char binary_to_ascii_char(char* numbin);
-//char* binary_to_ascii_string(char* frasebin);
-//char* codificadorVerman(char* frase, char* senha);
-
-
+void menuDecodeVernam(void);
 void clear_screen(void);
 
 //MAIN
@@ -148,7 +135,7 @@ void menucesar(){
     
 
     scanf(" %d",&k);
-
+    clear_screen();
     if(k>=0 && k<=25)
     {
     
@@ -208,7 +195,7 @@ void menudecode(){
             case 2:
 
                 clear_screen();
-                menuDecodeVerman();
+                menuDecodeVernam();
                 break;
 
             case 3:
@@ -249,6 +236,7 @@ void menudecodecesar(){
     
 
     scanf(" %d",&k);
+    clear_screen();
 
     if((k>=1 && k<=25) ||k==210)
     {
@@ -341,8 +329,7 @@ void derCaesarEncoder(char* mensagem,int k){
     }
 
     strcat(retorno,"\0");
-    
-    printf("\nCódigo Cifrado:\n\n%s\n",retorno);
+    printf("\nMensagem: %sRotacao: %d\nMensagem Cifrada:\n%s\n",mensagem, k, retorno);
     
 }
 
@@ -363,12 +350,14 @@ void menuVerman() {
     fgets(texto, 1024, stdin);
     texto[strcspn(texto, "\n")] = 0;
 
-    printf("\n\nDigite a chave da sua mensagem:\n");
+    printf("\nDigite a chave da sua mensagem:\n");
     fgets(senha, 1024, stdin);
     senha[strcspn(senha, "\n")] = 0;
 
     codeurVernam(texto, senha, cripto);
-    printf("\nTexto cifrado: %s\n", cripto);
+    clear_screen();
+
+    printf("\nMensagem: %s\nSenha: %s\nTexto cifrado:\n%s\n",texto,senha, cripto);
 
     free(texto);
     free(senha);
@@ -475,17 +464,20 @@ void decoderCesar(char* mensagem,int selecao){
 
         strcat(retorno,"\0");    
 
-        if(i<10)
+        if(i<9)
         {
 
-            printf("Rotacao 0%d: %s",i,retorno);
+            printf("Rotacao 0%d: %s",i+1,retorno);
         
+        }
+        else if(i==25){
+            printf("Codigo: %s",retorno);
         }
         else
         {
 
 
-            printf("Rotacao %d: %s",i,retorno);
+            printf("Rotacao %d: %s",i+1,retorno);
 
         }
 
@@ -527,7 +519,7 @@ char codeRevCesar(char letra,int k){
 
 //DECODIFICADOR DE VERNAM
 
-void menuDecodeVerman() {
+void menuDecodeVernam() {
     char* cripto = malloc(1024 * sizeof(char));
     char* senha = malloc(1024 * sizeof(char));
     char* decrypted_texto = malloc(1024 * sizeof(char));
@@ -543,9 +535,10 @@ void menuDecodeVerman() {
     printf("\n\nDigite a chave da sua mensagem:\n");
     fgets(senha, 1024, stdin);
     senha[strcspn(senha, "\n")] = 0;
+    clear_screen();
 
     decodeurVernam(cripto, senha, decrypted_texto);
-    printf("\nTexto decifrado: %s\n\n\n", decrypted_texto);
+    printf("\nCodigo: %s\nSenha: %s\nTexto decifrado:\n%s\n",cripto,senha, decrypted_texto);
 
     free(cripto);
     free(senha);
@@ -590,170 +583,3 @@ void clear_screen(){
 #endif
 
 }
-
-//cp paste residual
-
-
-//base input copiar nos menus.
-
-
-//codigo a seguir pode ser substituido por um simples "^" entre 2 strings....
-
-/*
-    fflush();
-    char* texto= malloc((1024)*sizeof(char));
-    printf("Digite o texto:\n");
-    fgets(texto,1024,stdin);
-    printf("\nAgora digite um numero de 0 a 25:\n");
-    scanf("%d",&k);
-
-}
-
-char* codificadorVernam(char* mensagem, char* chave){
-    
-    int lenm= strlen(mensagem);
-    int lenk= strlen(chave);
-    char* chavecomp=equalizadordestring(mensagem, chave);
-    char temp;
-    char* resultado=malloc((lenm+1)*sizeof(char));
-    for(int i=0;i<lenm;i++)
-    {
-
-        temp = mensagem[i] ^ chavecomp[i];
-        printf("%c",temp);
-    }
-    resultado[lenm]='\0';
-    free(chavecomp);
-    return resultado;
-}
-
-char* equalizadordestring(char* mensagem,char* chave){
-
-    int lenm=strlen(mensagem);
-    int lenk=strlen(chave);
-    char* temp=malloc((lenm+1)*sizeof(char));
-
-    for(int i=0;i<lenm;i++)
-    {
-
-        temp[i]=chave[i % lenk];
-    
-    }
-    
-    temp[lenm]='\0';
-    return temp;
-
-}
-
-char* codificadorVerman(char* frase, char* senha){
-    int len=strlen(frase);
-    char* retornobin=xor(ascii_to_binary_string(frase), ascii_to_binary_string(equalizador_de_string(frase,senha)));
-    char* retornoasc=binary_to_ascii_string(retornobin);
-    free(retornobin);
-    return retornoasc;
-}
-
-char* equalizador_de_string(char* frase, char* senha)
-{
-
-    if (!frase || !senha) {
-        return NULL;
-    }
-
-    int lens = strlen(frase);
-    int lensenha = strlen(senha);
-
-    char* retorno = malloc(lens * sizeof(char));
-    if (!retorno) {
-        return NULL;
-    }
-
-    char* temp = malloc(lens * sizeof(char));
-    if (!temp) {
-        free(retorno);
-        return NULL;
-    }
-
-    for (int i = 0; i < lens; i++) {
-        temp[i] = senha[i % lensenha];
-    }
-
-    strcpy(retorno, temp);
-    free(temp);
-    return retorno;
-
-}
-
-char* ascii_to_binary_string(char* frase)
-{
-
-    int len=strlen(frase);
-    char* retorno=malloc(((len*8)+1)*sizeof(char));
-    retorno[0]='\0';
-    char* temp=malloc(9*sizeof(char));
-
-    for(int i=0;i<len;i++){
-            temp=ascii_to_binary_char(frase[i]);
-            strcat(retorno,temp);
-            free(temp);
-
-    }
-    return retorno;
-}
-
-char* ascii_to_binary_char(char letra)
-{
-
-    unsigned char asciivalue= letra;
-    char* retornobin=malloc(9*sizeof(char));
-    if(retornobin==NULL){
-        return NULL;
-    }
-    sprintf(retornobin,"%08b",asciivalue);
-    return retornobin;
-
-}
-
-char* xor(char* mensagembin, char* chave)
-{   
-    int len =  strlen(mensagembin);
-    char* retorno=malloc((len+1)*sizeof(char));
-    if(retorno==NULL)
-    {
-        return NULL;
-    }
-    for (int i = 0; i < len; i++)
-    {
-        retorno[i] = (mensagembin[i] == chave[i]) ? '0' : '1';
-    }
-    retorno[len]='\0';
-    return retorno;
-}
-
-char* binary_to_ascii_string(char* frasebin)
-{
-    int len = strlen(frasebin);
-    char* retorno = malloc((len/8)+1);
-    if (retorno == NULL) {
-        return NULL;
-    }
-    retorno[0] = '\0';
-    for(int i=0; i<len; i+=8){
-        char temp = binary_to_ascii_char(frasebin + i);
-        char temp_str[2] = {temp, '\0'}; // create a string from the char
-        strcat(retorno, temp_str);
-    }
-    return retorno;
-}
-
-char binary_to_ascii_char(char* numbina) {
-    char retorno = 0;
-    for (int i = 0; i < 8; i++) {
-        retorno |= (numbina[7-i] - '0') << i;
-    }
-    while (!(retorno >= 32 && retorno <= 126)) { // Check if printable ASCII character
-        retorno = (retorno + 1) % 95 + 32; // Cycle through printable ASCII characters
-    }
-    return retorno;
-}
-*/
